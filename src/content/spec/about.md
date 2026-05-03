@@ -1,9 +1,12 @@
-# About
-This is the demo site for [Fuwari](https://github.com/saicaca/fuwari).
+# 关于
+本站由Fuwari改造而来。
 
-::github{repo="saicaca/fuwari"}
+This site is transformed from Fuwari.
 
-> ### Sources of images used in this site
-> - [Unsplash](https://unsplash.com/)
-> - [星と少女](https://www.pixiv.net/artworks/108916539) by [Stella](https://www.pixiv.net/users/93273965)
-> - [Rabbit - v1.4 Showcase](https://civitai.com/posts/586908) by [Rabbit_YourMajesty](https://civitai.com/user/Rabbit_YourMajesty)
+::github{repo="ike-lee-820/fuwari"}
+
+> ### 图片来源
+> - [哲风壁纸](https://haowallpaper.com/homeViewLook/15680536157524288)
+> - [Pixabay](https://pixabay.com/zh/images/search/)
+
+如有侵权，请联系删除。
