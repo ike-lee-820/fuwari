@@ -115,10 +115,11 @@ const jsonLd = {
 <div class="card-base p-6 mb-4">
     <div class="flex items-center mb-4">
         <div class="w-1 h-5 rounded-md bg-[var(--primary)] mr-3"></div>
-        <h2 class="text-xl font-bold">评论区</h2>
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-100">评论区</h2>
     </div>
     <Twikoo path={`/posts/${entry.slug}`} />
 </div>
+
 
 <div class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full">
         <a href={entry.data.nextSlug ? getPostUrlBySlug(entry.data.nextSlug) : "#"}
