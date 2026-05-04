@@ -1,0 +1,198 @@
+:root {
+  --tk-text: black;
+  --code-block-text: #d1d5db;
+}
+
+html.dark {
+  --tk-text: #d1d5db;
+}
+
+.tk-comments {
+  @apply text-[var(--tk-text)];
+}
+
+.tk-submit {
+  .tk-avatar {
+    @apply hidden;
+  }
+}
+
+/* Text Area */
+.tk-row {
+  .tk-col {
+    @apply flex-col-reverse;
+    .tk-input {
+      textarea {
+        @apply rounded-[var(--radius-large)] py-4 px-6 !min-h-[150px] focus:border-[var(--primary)];
+      }
+    }
+  }
+}
+
+/* Meta */
+.tk-meta-input {
+  @apply relative mt-3;
+  div {
+    @apply min-h-10;
+    .el-input-group__prepend {
+      @apply !bg-inherit rounded-l-lg;
+      min-height: inherit;
+    }
+    input {
+      @apply px-4 rounded-r-lg focus:!border-[var(--primary)];
+      min-height: inherit;
+    }
+  }
+}
+
+/* Button */
+.tk-row.actions {
+  @apply w-full !ml-0 !mt-0;
+  .__markdown {
+    @apply !hidden;
+  }
+  .tk-preview,
+  .tk-send,
+  .tk-cancel {
+    @apply border-none rounded-lg px-3 py-0 h-8
+       !bg-[var(--btn-regular-bg-active)] disabled:!bg-[var(--btn-regular-bg)]
+      !text-[var(--btn-content)] disabled:!text-[#ffffffa1];
+  }
+}
+
+/* Comment title */
+.tk-comments-title {
+  .__comments svg {
+    @apply fill-[var(--primary)];
+  }
+}
+
+.tk-comment {
+  @apply border-[1px] border-[rgba(144,147,153,0.31)] p-4 rounded-2xl hover:shadow-md transition-all;
+  .tk-action-icon svg {
+    @apply fill-[var(--primary)];
+  }
+}
+
+.tk-action {
+  .tk-action-count {
+    @apply text-[var(--btn-content)];
+  }
+}
+
+.tk-meta {
+  .tk-tag {
+    @apply border-none rounded-lg text-[var(--btn-content)];
+  }
+
+  .tk-tag-green {
+    @apply bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)] dark:text-[var(--deep-text)];
+  }
+}
+
+/* Content & Preview - 关键修复部分 */
+.tk-content,
+.tk-preview-container {
+  /* 图片表情显示优化 */
+  img {
+    @apply inline !align-bottom;
+  }
+
+  /* 链接样式 */
+  a {
+    @apply cursor-pointer hover:underline text-[var(--primary)] font-medium;
+  }
+
+  .tk-ruser {
+    @apply no-underline;
+  }
+
+  /* 行内代码样式 - 修复：移除了可能冲突的选择器 */
+  code:not(pre code) {
+    @apply bg-[var(--inline-code-bg)] rounded-md px-1 py-0.5 font-semibold;
+    color: var(--inline-code-color);
+  }
+
+  /* 列表样式 - 修复：使用更具体的选择器，避免影响其他元素 */
+  ul > li::marker {
+    content: '•';
+    color: var(--primary);
+  }
+  
+  ol > li::marker {
+    color: var(--primary);
+  }
+
+  /* 保留 Twikoo 原生的 Markdown 渲染 */
+  p {
+    margin: 0.5em 0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0.75em 0 0.5em 0;
+    font-weight: 600;
+  }
+
+  blockquote {
+    margin: 0.5em 0;
+    padding-left: 1em;
+    border-left: 4px solid rgba(144, 147, 153, 0.3);
+    color: var(--tk-text);
+    opacity: 0.9;
+  }
+
+  table {
+    border-collapse: collapse;
+    margin: 1em 0;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid rgba(144, 147, 153, 0.3);
+    padding: 0.5em;
+  }
+
+  th {
+    background-color: var(--btn-regular-bg);
+    font-weight: 600;
+  }
+}
+
+/* Replies */
+.tk-replies {
+  .tk-comment {
+    @apply bg-[var(--page-bg)];
+    .tk-content {
+      > span:first-of-type {
+        @apply text-xs;
+      }
+    }
+  }
+}
+
+/* Code block 代码块样式 */
+.twikoo .code-block {
+  pre {
+    @apply !rounded-xl;
+  }
+
+  /* Code block fall back */
+  pre:not([class]) {
+    @apply bg-[#2d2d2d] overflow-auto p-2 text-[var(--code-block-text)];
+  }
+
+  .copy-btn-icon {
+    width: inherit !important;
+    height: inherit !important;
+  }
+}
+
+.tk-expand-wrap .tk-expand,
+.tk-collapse-wrap .tk-expand {
+  @apply hover:rounded-lg mt-1 hover:bg-[var(--btn-plain-bg-hover)];
+}
+
+/* Emoji 组件显示修复 */
+.card-base {
+  overflow: visible;
+}
