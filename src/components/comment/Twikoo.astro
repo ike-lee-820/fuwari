@@ -1,48 +1,203 @@
 ---
-const config = {
-  el: "#comment",
-  path: Astro.props.path,
-};
+interface Props {
+  path?: string;
+}
+
+const { path } = Astro.props;
 ---
-<div id="comment">
-  <div class="text-center text-gray-500 dark:text-gray-400 p-8">
-    <p>评论区加载中...</p>
-    <p class="text-sm mt-2">如果长时间无法显示，请尝试刷新页面。</p>
+
+<div class="comment-wrapper">
+  <h2 class="comment-title">评论区</h2>
+  <div id="comment">
+    <div class="loading-placeholder">
+      <p>评论区加载中...</p>
+      <p class="hint">如果长时间无法显示，请尝试刷新页面。</p>
+    </div>
   </div>
 </div>
-<script is:inline define:vars={{ config }}>
-  function initTwikoo() {
-    const commentContainer = document.getElementById('comment');
-    if (!commentContainer) return;
 
-    // 清理旧的 Twikoo 实例和脚本
-    if (window.twikoo) {
-      window.twikoo = undefined;
+<script is:inline define:vars={{ path: path || '' }}>
+  (function() {
+    // 防止重复初始化
+    if (window.__twikooInitialized) return;
+    window.__twikooInitialized = true;
+
+    const TWIKOO_SCRIPT_ID = 'twikoo-script';
+    const CONTAINER_ID = 'comment';
+    const SCRIPT_SRC = '/twikoo/twikoo.min.js';
+    const ENV_ID = 'https://east-america.netlify.app/.netlify/functions/twikoo';
+
+    function getTheme() {
+      // Fuwari 使用 html.dark 类控制暗色模式
+      const isDark = document.documentElement.classList.contains('dark');
+      return isDark ? 'dark' : 'light';
     }
-    const oldScript = document.getElementById('twikoo-script');
-    if (oldScript) {
-      oldScript.remove();
-    }
 
-    // 创建并注入新的 Twikoo 脚本
-    const script = document.createElement('script');
-    script.id = 'twikoo-script';
-    script.src = '/twikoo/twikoo.min.js'; // 确保路径正确
-    script.defer = true;
-
-    // 脚本加载后初始化 Twikoo
-    script.onload = () => {
-      if (window.twikoo) {
-        window.twikoo.init({
-          ...config,
-          envId: "https://east-america.netlify.app/.netlify/functions/twikoo", // ！！！请替换为您的真实 envId
-          lang: 'zh-CN',
-        });
+    function cleanupTwikoo() {
+      // 清理脚本
+      const oldScript = document.getElementById(TWIKOO_SCRIPT_ID);
+      if (oldScript) oldScript.remove();
+      
+      // 清理容器内容
+      const container = document.getElementById(CONTAINER_ID);
+      if (container) {
+        container.innerHTML = `
+          <div class="loading-placeholder">
+            <p>评论区加载中...</p>
+            <p class="hint">如果长时间无法显示，请尝试刷新页面。</p>
+          </div>
+        `;
       }
-    };
-    document.head.appendChild(script);
+      
+      // 清理全局 twikoo 实例
+      if (window.twikoo) {
+        window.twikoo = undefined;
+      }
+    }
+
+    function loadScript() {
+      return new Promise((resolve, reject) => {
+        // 如果脚本已存在且加载完成
+        if (window.twikoo && window.twikoo.init) {
+          resolve();
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.id = TWIKOO_SCRIPT_ID;
+        script.src = SCRIPT_SRC;
+        script.defer = true;
+        
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Failed to load Twikoo script'));
+        
+        document.head.appendChild(script);
+      });
+    }
+
+    async function initTwikoo() {
+      const container = document.getElementById(CONTAINER_ID);
+      if (!container) return;
+
+      try {
+        cleanupTwikoo();
+        await loadScript();
+
+        if (window.twikoo && window.twikoo.init) {
+          window.twikoo.init({
+            el: '#' + CONTAINER_ID,
+            path: path || window.location.pathname,
+            envId: ENV_ID,
+            lang: 'zh-CN',
+            theme: getTheme(),
+          });
+        }
+      } catch (err) {
+        console.error('Twikoo init failed:', err);
+        if (container) {
+          container.innerHTML = '<p style="text-align:center;color:#ef4444;padding:2rem;">评论加载失败，请刷新重试</p>';
+        }
+      }
+    }
+
+    // 监听 Fuwari 的 swup 内容替换事件（比 astro:page-load 更可靠）
+    if (window.swup && window.swup.hooks) {
+      window.swup.hooks.on('content:replace', () => {
+        setTimeout(initTwikoo, 100);
+      });
+    }
+
+    // 备用：同时监听 Astro 标准事件
+    document.addEventListener('astro:page-load', initTwikoo);
+    document.addEventListener('astro:after-swap', () => {
+      setTimeout(initTwikoo, 150);
+    });
+
+    // 首次加载
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTwikoo);
+    } else {
+      initTwikoo();
+    }
+
+    // 监听暗色模式变化（Fuwari 切换主题时会修改 html 的 class）
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          const container = document.getElementById(CONTAINER_ID);
+          if (container && container.children.length > 1) { // 已加载评论
+            // 重新初始化以应用新主题
+            initTwikoo();
+          }
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  })();
+</script>
+
+<style>
+  .comment-wrapper {
+    margin-top: 3rem;
   }
 
-  // 监听 Astro 的页面加载事件来初始化评论
-  document.addEventListener('astro:page-load', initTwikoo);
-</script>
+  .comment-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    /* 适配 Fuwari 暗色模式 */
+    color: #18181b;
+  }
+
+  /* 暗色模式下的标题颜色 */
+  :global(html.dark) .comment-title {
+    color: #d4d4d8;
+  }
+
+  .loading-placeholder {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+  }
+
+  :global(html.dark) .loading-placeholder {
+    color: #9ca3af;
+  }
+
+  .loading-placeholder .hint {
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    opacity: 0.7;
+  }
+
+  /* Twikoo 暗色模式样式覆盖 */
+  :global(html.dark) .twikoo {
+    --twikoo-font-color: #d4d4d8;
+    --twikoo-card-bg: transparent;
+  }
+
+  :global(html.dark) .twikoo .tk-content,
+  :global(html.dark) .twikoo .tk-main {
+    color: #d4d4d8 !important;
+  }
+
+  :global(html.dark) .twikoo .tk-meta span {
+    color: #a1a1aa !important;
+  }
+
+  :global(html.dark) .twikoo .tk-input textarea,
+  :global(html.dark) .twikoo .tk-input input {
+    background-color: #27272a !important;
+    border-color: #3f3f46 !important;
+    color: #e4e4e7 !important;
+  }
+
+  :global(html.dark) .twikoo .tk-comment {
+    background-color: transparent !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+</style>
