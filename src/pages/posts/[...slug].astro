@@ -1,5 +1,6 @@
 ---
 import path from "node:path";
+import Twikoo from "@components/comment/Twikoo.astro";
 import License from "@components/misc/License.astro";
 import Markdown from "@components/misc/Markdown.astro";
 import I18nKey from "@i18n/i18nKey";
@@ -109,9 +110,17 @@ const jsonLd = {
             {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class="mb-6 rounded-xl license-container onload-animation"></License>}
 
         </div>
-    </div>
+</div>
 
-    <div class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full">
+<div class="card-base p-6 mb-4">
+    <div class="flex items-center mb-4">
+        <div class="w-1 h-5 rounded-md bg-[var(--primary)] mr-3"></div>
+        <h2 class="text-xl font-bold">评论区</h2>
+    </div>
+    <Twikoo path={`/posts/${entry.slug}`} />
+</div>
+
+<div class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full">
         <a href={entry.data.nextSlug ? getPostUrlBySlug(entry.data.nextSlug) : "#"}
            class:list={["w-full font-bold overflow-hidden active:scale-95", {"pointer-events-none": !entry.data.nextSlug}]}>
             {entry.data.nextSlug && <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-start gap-4" >
