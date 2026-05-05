@@ -7,7 +7,6 @@ tags: [初见]
 category: '初见'
 draft: false 
 lang: ''
-series:"初见"
 ---
 
 # 欢迎来到OCd博客！
