@@ -1,7 +1,7 @@
 /* 注册你的自定义字体并告诉浏览器它在哪里 */
 @font-face {
   font-family: 'song';
-  src: url('https://gh-proxy.com/github.com/ike-lee-820/fuwari/raw/refs/heads/main/public/fonts/song.otf') format('opentype');
+  src: url('https://gh-proxy.com/github.com/ike-lee-820/fuwari/raw/refs/heads/main/public/fonts/song.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
