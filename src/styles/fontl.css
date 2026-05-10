@@ -1,4 +1,6 @@
 @import url('./font.css');
+@import url('./font2.css');
+
 * {
   font-family: 'SourceHanSerifSC';
 }
